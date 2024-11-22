@@ -65,7 +65,7 @@ class GeminiAi:
         
 
 if __name__ == '__main__':
-    api_key = 'AIzaSyAjBYJJLqpIkWi7owhN_sdMDkd64GqeXoo'
+    api_key = 'AIzaSyAjBYJJLqpIkWi7owhN_sdMDkd64GqeXoo'  #I'm very consious about security :)
     ai_model = 'gemini-1.5-flash'
     app = QApplication([])
     context = UI(api_key,ai_model)
