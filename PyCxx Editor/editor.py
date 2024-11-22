@@ -168,7 +168,7 @@ class UI(QWidget):
             input_prompt = self._ai.loadPrompt('prompt_train/explain.txt')
             print('explain')
         elif self._prompt_command.currentIndex() == 2: #fixt
-            pass
+            input_prompt = self._ai.loadPrompt(r'prompt_train\fixt.txt')
         elif self._prompt_command.currentIndex() == 3: #comment
             pass
 
