@@ -30,6 +30,7 @@ QLineEdit#prompt{
     padding: 5px;
 }
 QPushButton#send{
+    color: black;
     background-color: rgb(207, 206, 206);
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
     font-size: 15px;
