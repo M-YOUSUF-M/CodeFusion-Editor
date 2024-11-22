@@ -12,6 +12,7 @@ from PyQt5.QtWidgets import (
     QTreeWidget,
     QTreeWidgetItem,
     QDockWidget,
+    QComboBox
 )
 from PyQt5.QtGui import QColor
 from PyQt5.Qsci import (
@@ -39,6 +40,10 @@ class GeminiAi:
     def generateAnswer(self,input:str):
         response = self._model.generate_content(input,stream=True)
         return response
+    def loadPrompt(self,file_name:str):
+        with open(file_name) as file:
+            prompt_enhance = file.read()
+        return prompt_enhance
 
 
 class UI(QWidget):
@@ -67,6 +72,12 @@ class UI(QWidget):
 
         self.ide = Editor()
         self._ai = GeminiAi("AIzaSyAjBYJJLqpIkWi7owhN_sdMDkd64GqeXoo", "gemini-1.5-flash")
+        
+        self._prompt_command = QComboBox()
+        self._prompt_command.addItem('None')
+        self._prompt_command.addItem('explain')
+        self._prompt_command.addItem('fixt')
+        self._prompt_command.addItem('comment')
         self._prompt = QLineEdit()
         self._prompt.setObjectName('prompt')
         self._send_button = QPushButton('Send')
@@ -85,6 +96,7 @@ class UI(QWidget):
         self.left_side_layout.addWidget(self._file_tree)
 
         self.prompt_layout = QHBoxLayout()
+        self.prompt_layout.addWidget(self._prompt_command)
         self.prompt_layout.addWidget(self._prompt)
         self.prompt_layout.addWidget(self._send_button)
 
@@ -95,6 +107,7 @@ class UI(QWidget):
         self._chat_area = QTextEdit()
         self._chat_area.setReadOnly(True)
         self.dock_layout = QDockWidget()
+        self.dock_layout.setFeatures(QDockWidget.DockWidgetFeature.DockWidgetClosable)
         self.dock_layout.setWidget(self._chat_area)
         self.dock_layout.hide()
 
@@ -149,10 +162,21 @@ class UI(QWidget):
             self.add_tree_items(root_item, folder)
     
     def collectInput(self):
+        if self._prompt_command.currentIndex() == 0: #none
+            input_prompt = ''
+        elif self._prompt_command.currentIndex() == 1: #explain
+            input_prompt = self._ai.loadPrompt('prompt_train/explain.txt')
+            print('explain')
+        elif self._prompt_command.currentIndex() == 2: #fixt
+            pass
+        elif self._prompt_command.currentIndex() == 3: #comment
+            pass
+
         input_command = self._prompt.text()
         input_code = self.ide.text()
         self._prompt.clear()
-        final_input = input_command + '\n' + input_code
+        final_input = input_prompt + input_command + '\n' + input_code
+
         return final_input
 
     def printOutput(self):
