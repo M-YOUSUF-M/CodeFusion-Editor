@@ -10,7 +10,8 @@ from PyQt5.QtWidgets import (
     QVBoxLayout,
     QHBoxLayout,
     QTreeWidget,
-    QTreeWidgetItem
+    QTreeWidgetItem,
+    QDockWidget,
 )
 from PyQt5.QtGui import QColor
 from PyQt5.Qsci import (
@@ -22,10 +23,22 @@ from PyQt5.Qsci import (
     QsciLexerJavaScript
 )
 
+import google.generativeai as gemini
+
 import os
 import subprocess
 import shutil
 import sys
+
+class GeminiAi:
+    def __init__(self, api_key:str, ai_model:str):
+        gemini.configure(api_key=api_key)
+        self._model = gemini.GenerativeModel(ai_model)
+        self._chat = self._model.start_chat() 
+    
+    def generateAnswer(self,input:str):
+        response = self._model.generate_content(input,stream=True)
+        return response
 
 
 class UI(QWidget):
@@ -53,10 +66,13 @@ class UI(QWidget):
         self.menu_bar_layout.addWidget(self.__runProg)
 
         self.ide = Editor()
+        self._ai = GeminiAi("AIzaSyAjBYJJLqpIkWi7owhN_sdMDkd64GqeXoo", "gemini-1.5-flash")
         self._prompt = QLineEdit()
         self._prompt.setObjectName('prompt')
         self._send_button = QPushButton('Send')
         self._send_button.setObjectName('send')
+        self._send_button.clicked.connect(self.printOutput)
+
 
         self._file_tree = QTreeWidget()
         self._file_tree.setObjectName('tree_view')
@@ -76,6 +92,12 @@ class UI(QWidget):
         self.right_side_layout.addLayout(self.prompt_layout)
         self.right_side_layout.addWidget(self.ide)
 
+        self._chat_area = QTextEdit()
+        self._chat_area.setReadOnly(True)
+        self.dock_layout = QDockWidget()
+        self.dock_layout.setWidget(self._chat_area)
+        self.dock_layout.hide()
+
         self.__folder.clicked.connect(self.showFiles)
         self.__newfile.clicked.connect(self.ide.newFile)
         self.__openfile.clicked.connect(self.openAndShowFilesFolder)
@@ -85,6 +107,7 @@ class UI(QWidget):
         self.main_layout = QHBoxLayout()
         self.main_layout.addLayout(self.left_side_layout)
         self.main_layout.addLayout(self.right_side_layout, 80)
+        self.main_layout.addWidget(self.dock_layout, 40)
         # self.main_layout.addWidget(self.ide,75)
 
         self.setLayout(self.main_layout)
@@ -124,6 +147,25 @@ class UI(QWidget):
             root_item.setData(0, Qt.UserRole, folder)
             root_item.setExpanded(True)
             self.add_tree_items(root_item, folder)
+    
+    def collectInput(self):
+        input_command = self._prompt.text()
+        input_code = self.ide.text()
+        self._prompt.clear()
+        final_input = input_command + '\n' + input_code
+        return final_input
+
+    def printOutput(self):
+        markdown = ""
+        self.dock_layout.show()
+        self.dock_layout.repaint()
+        for chunk in self._ai.generateAnswer(self.collectInput()):
+            # self._chat_area.insertPlainText(chunk.text)
+            # self._chat_area.repaint()
+            markdown += chunk.text 
+            self._chat_area.setMarkdown(markdown)
+            self._chat_area.repaint()
+        self._chat_area.append('\n')
 
 
 class Editor(QsciScintilla):
@@ -162,7 +204,7 @@ class Editor(QsciScintilla):
                     self.lexer = QsciLexerCSS()
                 case "js":
                     self.lexer = QsciLexerJavaScript()
-                case "_":
+                case _:
                     self.lexer = None
             self.setLexer(self.lexer)
 

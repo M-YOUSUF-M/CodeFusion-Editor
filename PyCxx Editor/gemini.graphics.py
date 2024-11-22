@@ -1,8 +1,13 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (
-    QApplication , QWidget,
-    QLabel,QTextEdit,QPushButton,QLineEdit,
-    QVBoxLayout,QHBoxLayout 
+    QApplication,
+    QWidget,
+    QLabel,
+    QTextEdit,
+    QPushButton,
+    QLineEdit,
+    QVBoxLayout,
+    QHBoxLayout 
 )
 from PyQt5.QtGui import (
     QColor
@@ -49,6 +54,7 @@ class UI(QWidget):
     def printOutput(self):
         for chunk in self._ai.generateAnswer(self.collectInput()):
             self._chat_area.insertPlainText(chunk.text)
+            self._chat_area.repaint()
         self._chat_area.append('\n')
 
         
