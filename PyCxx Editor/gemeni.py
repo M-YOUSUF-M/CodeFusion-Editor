@@ -4,7 +4,7 @@ import textwrap
 import google.generativeai as gemini
 
 
-gemini.configure(api_key='AIzaSyAjBYJJLqpIkWi7owhN_sdMDkd64GqeXoo')
+gemini.configure(api_key='AIzaSyAjBYJJLqpIkWi7owhN_sdMDkd64GqeXoo') #I'm very consious about security :)
 
 """
 for m in gemini.list_models():
