@@ -1,4 +1,10 @@
-from PyQt5.QtCore import Qt, pyqtSlot
+from PyQt5.QtCore import (
+    Qt, 
+    pyqtSlot,
+    QObject,
+    QThread,
+    pyqtSignal
+)
 from PyQt5.QtWidgets import (
     QApplication,
     QWidget,
@@ -31,6 +37,22 @@ import subprocess
 import shutil
 import sys
 
+class GeminiThreat(QThread):
+    progress = pyqtSignal(str)
+    def __init__(self,chat_area:QTextEdit,input:str):
+        super(QThread,self).__init__()
+        self.chat_area = chat_area
+        self.input_text = input
+        # self.finished = pyqtSignal()
+        self.ai = GeminiAi("AIzaSyAjBYJJLqpIkWi7owhN_sdMDkd64GqeXoo", "gemini-1.5-flash")
+    def run(self):
+        markdown = ''
+        for chunk in self.ai.generateAnswer(self.input_text):
+            # self._chat_area.insertPlainText(chunk.text)
+            # self._chat_area.repaint()
+            markdown += chunk.text 
+            self.progress.emit(markdown)
+            
 class GeminiAi:
     def __init__(self, api_key:str, ai_model:str):
         gemini.configure(api_key=api_key)
@@ -82,7 +104,7 @@ class UI(QWidget):
         self._prompt.setObjectName('prompt')
         self._send_button = QPushButton('Send')
         self._send_button.setObjectName('send')
-        self._send_button.clicked.connect(self.printOutput)
+        self._send_button.clicked.connect(self.runThread)
 
 
         self._file_tree = QTreeWidget()
@@ -179,18 +201,17 @@ class UI(QWidget):
 
         return final_input
 
-    def printOutput(self):
-        markdown = ""
+    def runThread(self):
         self.dock_layout.show()
         self.dock_layout.repaint()
-        for chunk in self._ai.generateAnswer(self.collectInput()):
-            # self._chat_area.insertPlainText(chunk.text)
-            # self._chat_area.repaint()
-            markdown += chunk.text 
-            self._chat_area.setMarkdown(markdown)
-            self._chat_area.repaint()
-        self._chat_area.append('\n')
+        
+        self.ai_work = GeminiThreat(self._chat_area,self.collectInput()) 
+        self.ai_work.progress.connect(self.updateChatArea)
+        self.ai_work.start()
 
+    def updateChatArea(self, text: str):
+        self._chat_area.setMarkdown(text)
+        self._chat_area.repaint() 
 
 class Editor(QsciScintilla):
     def __init__(self):
