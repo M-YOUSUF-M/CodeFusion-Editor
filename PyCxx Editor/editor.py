@@ -460,6 +460,11 @@ class Editor(QsciScintilla): # Defining a class Editor that inherits from QsciSc
 
         self.setAutoIndent(True) # Enabling auto-indent.
 
+        self.setAutoCompletionSource(QsciScintilla.AcsAll)  # Enable all sources for auto completion (api + editor stream)
+
+        self.setAutoCompletionThreshold(1) #threshold for the number of character the suggestion will show
+
+
 
 
         self.file_path = '' # Initializing the file path to an empty string.
