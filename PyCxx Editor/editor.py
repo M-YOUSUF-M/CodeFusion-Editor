@@ -389,11 +389,11 @@ class UI(QWidget): # Defining a class UI that inherits from QWidget to represent
 
         elif self._prompt_command.currentIndex() == 2: #fixt
 
-            input_prompt = self._ai.loadPrompt(r'prompt_train\fixt.txt') # Loading the 'fixt' prompt from a file.
+            input_prompt = self._ai.loadPrompt('prompt_train/fixt.txt') # Loading the 'fixt' prompt from a file.
 
         elif self._prompt_command.currentIndex() == 3: #comment
 
-            pass # Doing nothing if 'comment' is selected.
+            input_prompt = self._ai.loadPrompt('prompt_train/comment.txt')
 
 
 
