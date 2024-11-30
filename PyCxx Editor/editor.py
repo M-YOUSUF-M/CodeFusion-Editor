@@ -71,6 +71,7 @@ import google.generativeai as gemini # Importing the Google Gemini AI library.
 
 
 import os # Importing the os module for operating system functionalities.
+import platform #Importing the platform module for system functionalities.
 
 import subprocess # Importing the subprocess module for running external commands.
 
@@ -600,6 +601,9 @@ class Editor(QsciScintilla): # Defining a class Editor that inherits from QsciSc
         print("file saved") # Printing "file saved" to the console.
 
 
+    def openTerminalRunCommand(self,command):
+        if platform.system() == 'Windows':
+            subprocess.Popen(["powershell","-NoExit","-Command",command])
 
     def is_executable_available(self, executable_name): # Method to check if an executable is available on the system.
 
@@ -645,7 +649,10 @@ class Editor(QsciScintilla): # Defining a class Editor that inherits from QsciSc
 
                 # execute_command_in_terminal(f"python {file_path}") #commented out: Unnecessary function call.
 
-                subprocess.run(["python", file_path]) # Running the Python script.
+                # subprocess.run(["python", file_path]) # Running the Python script.
+                command = f'python {os.path.join(self.dir_path,self.file_path)}'
+                self.openTerminalRunCommand(command)
+
 
             else:
 
@@ -683,11 +690,9 @@ class Editor(QsciScintilla): # Defining a class Editor that inherits from QsciSc
 
                    print("Compilation successful. Running the program...") # Printing a message to the console.
 
-                   subprocess.run([output_file]) # Running the compiled program.
+                #    subprocess.run([output_file]) # Running the compiled program.
+                   self.openTerminalRunCommand(output_file)
 
-                # Clean up the compiled output file after running
-
-                   # os.remove(output_file) #commented out: Cleanup is not necessary here.
 
                 else:
 
