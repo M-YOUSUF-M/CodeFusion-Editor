@@ -79,7 +79,7 @@ import shutil # Importing the shutil module for high-level file operations.
 
 import sys # Importing the sys module for system-specific parameters and functions.
 
-
+from install import prompt_pkg
 
 class GeminiThreat(QThread): # Defining a class GeminiThreat that inherits from QThread for handling AI operations in a separate thread.
 
@@ -656,7 +656,8 @@ class Editor(QsciScintilla): # Defining a class Editor that inherits from QsciSc
 
             else:
 
-                print("Python interpreter not found. Please install Python.") # Printing an error message to the console.
+                print("Python interpreter not found.") # Printing an error message to the console.
+                prompt_pkg('python')
 
 
 
@@ -701,12 +702,11 @@ class Editor(QsciScintilla): # Defining a class Editor that inherits from QsciSc
             else:
 
                 print(f"{compiler} compiler not found. Please install {compiler}.") # Printing an error message to the console.
-
-
+                prompt_pkg(compiler)
 
         else:
 
-            print("Unsupported file type. Please provide a .py, .c, or .cpp file.") # Printing an error message to the console.
+            print("Unsupported file type. Please provide a '.py', '.c', or '.cpp' file.") # Printing an error message to the console.
 
 
 
