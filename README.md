@@ -26,4 +26,7 @@ Run the following commands to install the required dependencies:
 pip install PyQt5
 pip install qscintilla --no-cache-dir
 pip install google-generativeai
+-----------------------------------
+cd 'PyCxx-Editor\PyCxx Editor'
+python editor.py
 
