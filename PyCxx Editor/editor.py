@@ -493,7 +493,7 @@ class UI(QWidget):
     def show_prompt(self, package):
         self.ok_btn.clicked.connect(lambda: self.ide.install(
             package
-        ) or self.install_prompt.hide())
+        ) or self.install_prompt.close())
         self.install_prompt.setWindowTitle(f"Install {package}")
         self.install_text.setText(f"Do you want to install {package}?")
         self.install_prompt.show()
