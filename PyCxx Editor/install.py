@@ -13,26 +13,27 @@ pkg_map = {
 term_map = {
     "konsole": "konsole --hold -e {}",
     "alacritty": "alacritty --hold -e {}",
-    "konsole": "kitty --hold --detach -e {}",
+    "kitty": "kitty --hold --detach -e {}",
     "powershell":"powershell -NoExit -Command {}",
     "gnome-terminal": "gnome-terminal --hold -e {}",
     "xfce-terminal": "xfce-terminal --hold -e {}",
     "xterm": "xterm --hold -e {}",
 }
 
+def execute_cmd(cmd):
+    for term in term_map:
+        if shutil.which(term) is not None:
+            final = term_map[term].format(cmd)
+            subprocess.Popen(final, shell=True)
+            break
+
 def install(package):
     if not shutil.which(package):
-        print("Package not installed")
-    if platform.system() == "Linux" or platform.system() == "Darwin":
-        for pkg in pkg_map:
-            if shutil.which(pkg) is not None:
-                cmd = pkg_map[pkg].format(package)
-                for term in term_map:
-                    if shutil.which(term) is not None:
-                        final = term_map[term].format(cmd)
-                        print(final)
-                        subprocess.Popen(final, shell=True)
-                        break
+        print(f"Package {package} is not installed")
+    for pkg in pkg_map:
+        if shutil.which(pkg) is not None:
+            cmd = pkg_map[pkg].format(package)
+            execute_cmd(cmd)
 
 def prompt_pkg(package):
     app = QApplication([])
@@ -45,7 +46,7 @@ def prompt_pkg(package):
     ok_btn = QPushButton("OK")
     cc_btn = QPushButton("Cancel")
     ok_btn.clicked.connect(lambda: install(package) or app.closeAllWindows())
-    cc_btn.clicked.connect(app.closeAllWindows)
+    cc_btn.clicked.connect(main_context.close)
 
     main_layout = QVBoxLayout()
     btn_layout = QHBoxLayout()
@@ -59,5 +60,3 @@ def prompt_pkg(package):
     main_context.setLayout(main_layout)
     main_context.show()
     app.exec_()
-
-prompt_pkg("python")
