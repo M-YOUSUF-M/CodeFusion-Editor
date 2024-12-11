@@ -583,7 +583,7 @@ class UI(QWidget):
                 command = f'python "{os.path.join(self.ide.dir_path, self.ide.file_path)}"'
                 self.execute_cmd(command)
 
-            else:f
+            else:
 
                 # Printing an error message to the console.
                 print("Python interpreter not found.")
