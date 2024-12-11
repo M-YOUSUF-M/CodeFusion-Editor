@@ -580,11 +580,10 @@ class UI(QWidget):
                 # execute_command_in_terminal(f"python {file_path}") #commented out: Unnecessary function call.
 
                 # subprocess.run(["python", file_path]) # Running the Python script.
-                command = f'python "{os.path.join(
-                    self.ide.dir_path, self.ide.file_path)}"'
+                command = f'python "{os.path.join(self.ide.dir_path, self.ide.file_path)}"'
                 self.execute_cmd(command)
 
-            else:
+            else:f
 
                 # Printing an error message to the console.
                 print("Python interpreter not found.")
