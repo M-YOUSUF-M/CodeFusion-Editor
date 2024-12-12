@@ -234,6 +234,7 @@ class UI(QWidget):
         self.menu_bar_layout.addWidget(self.__runProg)
 
         self.ide = Editor()  # Creating an instance of the Editor class.
+        self.ide.setObjectName("ide-background")
 
         # Initializing GeminiAi object.
         self._ai = GeminiAi(
@@ -517,11 +518,14 @@ class UI(QWidget):
         self._chat_area.repaint()  # Repainting the chat area.
 
     def execute_cmd(self, cmd):
-        for term in term_map:
-            if shutil.which(term) is not None:
-                final = term_map[term].format(cmd)
-                subprocess.Popen(final, shell=True)
-                break
+        if platform.system() == "Windows":
+            subprocess.Popen(["powershell", "-NoExit", "-Command", cmd])
+        else:
+            for term in term_map:
+                if shutil.which(term) is not None:
+                    final = term_map[term].format(cmd)
+                    subprocess.Popen(final, shell=True)
+                    break
 
     def install(self, package):
         if not shutil.which(package):
@@ -581,6 +585,7 @@ class UI(QWidget):
 
                 # subprocess.run(["python", file_path]) # Running the Python script.
                 command = f'python "{os.path.join(self.ide.dir_path, self.ide.file_path)}"'
+                print(command)
                 self.execute_cmd(command)
 
             else:
@@ -609,7 +614,7 @@ class UI(QWidget):
 
                 # Setting the output file name.
                 output_file = (f"{base_name.split('/')[-1]}.exe" if platform.system() == "Windows" else f"{base_name.split('/')[-1]}.out")
-
+                os.chdir(self.ide.dir_path)
                 # Creating the compile command.
                 compile_command = [compiler, file_path, "-o", output_file]
 
@@ -625,10 +630,11 @@ class UI(QWidget):
 
                     # Printing a message to the console.
                     print("Compilation successful. Running the program...")
-                    output_command = output_file.replace("\\","/").split('.')[0]
-
+                    if platform.system() == "Windows":
+                        output_command = output_file.replace("\\","/").split('.')[0]
+                        
                 #    subprocess.run([output_file]) # Running the compiled program.
-                    self.execute_cmd(output_command)
+                    self.execute_cmd(f"./{output_command}")
 
                 else:
 
