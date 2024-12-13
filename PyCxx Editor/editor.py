@@ -52,6 +52,8 @@ from PyQt5.Qsci import (
 
     QsciScintilla,
 
+    QsciAPIs,
+
     QsciLexerPython,
 
     QsciLexerCPP,
@@ -79,6 +81,11 @@ import shutil  # Importing the shutil module for high-level file operations.
 
 # Importing the sys module for system-specific parameters and functions.
 import sys
+import builtins
+import keyword
+import jedi
+import inspect
+
 
 pkg_map = {
     "apt": "sudo apt install {} -y",
@@ -747,6 +754,7 @@ class Editor(QsciScintilla):
 
             # Setting the lexer for syntax highlighting.
             self.setLexer(self.lexer)
+            self.setup_autocomplete()
 
     def openFile(self):  # Method to open a file using a file dialog.
 
@@ -844,7 +852,62 @@ class Editor(QsciScintilla):
 
         # Returning True if the executable is found, False otherwise.
         return shutil.which(executable_name) is not None
+    def setup_autocomplete(self):
+        # Initialize API object for Python Lexer
+        api = QsciAPIs(self.lexer)
+        # Add built-in functions, keywords, and standard libraries
+        self.add_builtin_functions(api)
+        self.add_keywords(api)
+        self.add_standard_libraries(api)
 
+        # Add third-party modules using jedi
+        self.add_third_party_modules(api)
+
+        # Prepare the API for usage in auto-completion
+        api.prepare()
+
+    def add_builtin_functions(self, api):
+        """Add built-in Python functions (like print(), len(), etc.) to the API"""
+        for name, obj in builtins.__dict__.items():
+            if callable(obj):
+                api.add(name)
+
+    def add_keywords(self, api):
+        """Add Python keywords (like if, else, for, etc.) to the API"""
+        for kw in keyword.kwlist:
+            api.add(kw)
+
+    def add_standard_libraries(self, api):
+        """Add common Python standard libraries (like os, sys, math, etc.)"""
+        try:
+            import sys
+            standard_libs = sys.builtin_module_names
+            for lib in standard_libs:
+                api.add(lib)
+        except Exception as e:
+            print("Error while adding standard libraries:", e)
+
+        self.add_module_functions(api,'os')
+        self.add_module_functions(api,'sys')
+    def add_module_functions(self,api,module_name):
+        try:
+            module = __import__(module_name)
+            for name , obj in inspect.getmembers(module):
+                if callable(obj):
+                    api.add(f"{module_name}.{name}")
+        except ImportError:
+            print(f"Moudle {module_name} could not imported.")
+
+    def add_third_party_modules(self, api):
+        """Add third-party modules installed via pip using jedi."""
+        try:
+        # Create a static list of currently loaded module names
+            installed_modules = list(sys.modules.keys())
+            for module_name in installed_modules:
+                if module_name not in sys.builtin_module_names:
+                    self.add_module_functions(api, module_name)
+        except Exception as e:
+            print(f"Error while adding third-party modules: {e}")
 
 def load_stylesheet(file_name):  # Function to load a stylesheet from a file.
 
