@@ -727,14 +727,17 @@ class Editor(QsciScintilla):
                 case "py":
 
                     self.lexer = QsciLexerPython()
+                    self.setupAutocompletePython()
 
                 case "c":
 
                     self.lexer = QsciLexerCPP()
+                    self.cAutoCompletion()
 
                 case "cpp":
 
                     self.lexer = QsciLexerCPP()
+                    self.cppAutoCompletion()
 
                 case "html":
 
@@ -754,7 +757,7 @@ class Editor(QsciScintilla):
 
             # Setting the lexer for syntax highlighting.
             self.setLexer(self.lexer)
-            self.setup_autocomplete()
+            
 
     def openFile(self):  # Method to open a file using a file dialog.
 
@@ -852,7 +855,7 @@ class Editor(QsciScintilla):
 
         # Returning True if the executable is found, False otherwise.
         return shutil.which(executable_name) is not None
-    def setup_autocomplete(self):
+    def setupAutocompletePython(self):
         # Initialize API object for Python Lexer
         api = QsciAPIs(self.lexer)
         # Add built-in functions, keywords, and standard libraries
@@ -908,6 +911,119 @@ class Editor(QsciScintilla):
                     self.add_module_functions(api, module_name)
         except Exception as e:
             print(f"Error while adding third-party modules: {e}")
+    def cppAutoCompletion(self):
+        api = QsciAPIs(self.lexer)
+        """Add C++ keywords and common functions to the auto-completion API."""
+        cpp_headers = [
+            "#include", "#define", "#if", "#elif", "#else", "#endif", "#ifdef", "#ifndef", "#pragma", "#error", "#warning", 
+            "iostream", "fstream", "sstream", "string", "vector", "map", "set", "list", "deque", 
+            "algorithm", "cmath", "cstdlib", "ctime", "cassert", "cstdio", "cstring", "climits", 
+            "cfloat", "iterator", "memory", "functional", "thread", "mutex", "condition_variable", 
+            "atomic", "type_traits", "initializer_list", "tuple", "exception", "stdexcept", "utility", 
+            "bitset", "random", "regex", "locale", "valarray", "array", "unordered_map", "unordered_set",
+            "chrono", "future", "numeric", "memory", "complex", "valarray", "exception", "bitset", 
+            "tuple", "initializer_list", "atomic", "thread", "mutex", "shared_mutex", "condition_variable", 
+            "unordered_map", "unordered_set", "deque", "array", "map", "set", "queue", "stack", "bitset", 
+            "typeindex", "typeinfo", "exception", "stdexcept", "limits", "locale", "random", "regex", "functional", 
+            "cctype", "cstdlib", "clocale", "cfenv", "cassert", "cstdarg", "cstdio", "cstring", "ctime", "cmath", 
+            "cstdio", "cfloat", "climits", "iterator", "type_traits", "chrono", "thread", "future", "atomic", 
+            "sstream", "sstream", "unordered_map", "unordered_set", "shared_ptr", "unique_ptr", "weak_ptr", 
+            "mutex", "condition_variable", "tuple", "string", "functional", "memory", "exception", "numeric", 
+            "type_traits", "initializer_list", "cstdint", "iostream", "iomanip", "sstream", "cstdlib", "cstdio", 
+            "valarray", "array", "tuple", "unordered_map", "unordered_set", "memory", "atomic", "complex", "queue", 
+            "deque", "list", "map", "set", "vector", "algorithm", "functional", "random", "regex", "locale", 
+            "bitset", "numeric", "chrono", "thread", "mutex", "condition_variable", "shared_mutex", "memory"
+        ]       
+
+
+        for library in cpp_headers:
+            api.add(library)
+
+        cpp_keywords = [
+            "int", "float", "double", "char", "bool", "void", "if", "else", "while", "for", "switch", "case",
+            "break", "continue", "return", "struct", "class", "public", "private", "protected", "namespace",
+            "using", "include", "define", "template", "typename", "new", "delete", "try", "catch", "throw",
+            "alignas", "alignof", "const", "constexpr", "decltype", "dynamic_cast", "explicit", "export", 
+            "friend", "inline", "mutable", "noexcept", "nullptr", "operator", "private", "protected", 
+            "public", "reinterpret_cast", "static", "static_assert", "static_cast", "thread_local", "typeid"
+        ]
+        for kw in cpp_keywords:
+            api.add(kw)
+
+        cpp_functions = [
+            "main", "std::cout", "std::cin", "std::endl", "std::string", "std::vector", "std::map", 
+            "std::set", "std::list", "std::deque", "std::sort", "std::find", "std::max", "std::min", 
+            "std::abs", "std::swap", "std::to_string", "std::stoi", "std::stod", "std::stof", 
+            "std::thread", "std::mutex", "std::lock_guard", "std::unique_lock", "std::condition_variable"
+        ]
+        for func in cpp_functions:
+            api.add(func)
+
+        cpp_types = [
+            "std::string", "std::vector", "std::map", "std::set", "std::list", "std::deque", "std::pair", 
+            "std::tuple", "std::array", "std::unique_ptr", "std::shared_ptr", "std::weak_ptr", "std::function", 
+            "std::atomic", "std::mutex", "std::thread", "std::chrono", "std::exception", "std::runtime_error", 
+            "std::invalid_argument", "std::out_of_range", "std::logic_error"
+        ]
+        for t in cpp_types:
+            api.add(t)
+        api.prepare()
+
+    def cAutoCompletion(self):
+        api = QsciAPIs(self.lexer)
+        """Add C keywords, functions, and common headers to the auto-completion API."""
+        # C headers
+        c_headers = [
+        "#include", "#define", "#if", "#elif", "#else", "#endif", "#ifdef", "#ifndef", "#pragma", "#error", "#warning", 
+        "stdio.h", "stdlib", "string", "math", "time", "ctype", "assert", "float.h", "limits.h", "stdarg.h", "stddef.h", 
+        "inttypes.h", "stdint.h", "errno.h", "signal.h", "setjmp.h", "pthread.h", "unistd.h", "fcntl.h", "sys/types.h", 
+        "sys/stat.h", "sys/time.h", "sys/socket.h", "netinet/in.h", "arpa/inet.h", "dirent.h", "poll.h", "sys/ioctl.h", 
+        "sys/mman.h", "sys/utsname.h", "sys/sysctl.h", "syslog.h", "locale.h", "regex.h", "complex.h", "sys/resource.h", 
+        "pthread.h", "unistd.h", "fcntl.h", "signal.h", "stdalign.h"
+        ]
+    
+        for header in c_headers:
+            api.add(header)
+
+        # C keywords
+        c_keywords = [
+        "int", "float", "double", "char", "long", "short", "signed", "unsigned", "void", "const", "volatile", "static", 
+        "extern", "register", "auto", "inline", "typedef", "sizeof", "enum", "struct", "union", "goto", "if", "else", 
+        "switch", "case", "break", "continue", "return", "for", "while", "do", "default", "typedef", "sizeof", 
+        "typeof", "alignas", "alignof", "restrict", "noreturn", "noexcept", "typeof"
+        ]
+    
+        for kw in c_keywords:
+            api.add(kw)
+
+        # C standard library functions
+        c_functions = [
+        "printf", "scanf", "sprintf", "sscanf", "fopen", "fclose", "fread", "fwrite", "fseek", "ftell", "rewind", 
+        "feof", "ferror", "perror", "malloc", "calloc", "realloc", "free", "exit", "abort", "atexit", "system", 
+        "getenv", "setenv", "unsetenv", "putenv", "memcpy", "memmove", "memcmp", "memset", "strcpy", "strncpy", 
+        "strcat", "strncat", "strcmp", "strncmp", "strlen", "strchr", "strrchr", "strstr", "strtok", "strdup", 
+        "strtol", "strtoul", "strtod", "strtof", "atof", "atoi", "atol", "abs", "labs", "div", "ldiv", "rand", 
+        "srand", "time", "clock", "localtime", "gmtime", "strftime", "difftime", "mktime", "exit", "fmod", "pow", 
+        "sqrt", "log", "log10", "exp", "sin", "cos", "tan", "asin", "acos", "atan", "atan2", "ceil", "floor", 
+        "fabs", "frexp", "modf", "ldexp", "ldexp", "isalpha", "isdigit", "isalnum", "isspace", "isupper", "islower", 
+        "isprint", "isgraph", "isxdigit", "isblank", "toupper", "tolower", "strcoll", "strxfrm", "strcspn", 
+        "strspn", "strpbrk", "strlcpy", "strlcat", "getchar", "putchar", "getch", "putch", "gets", "puts"
+        ]
+    
+        for func in c_functions:
+            api.add(func)
+
+        # C types
+        c_types = [
+        "int", "float", "double", "char", "long", "short", "signed", "unsigned", "void", "const", "volatile", 
+        "FILE", "size_t", "ptrdiff_t", "ssize_t", "off_t", "clock_t", "time_t", "jmp_buf", "va_list", "sigset_t", 
+        "pthread_t", "pthread_mutex_t", "pthread_cond_t", "pthread_attr_t", "pthread_key_t", "pthread_once_t", 
+        "pthread_rwlock_t", "pthread_spinlock_t", "pthread_barrier_t"
+        ]
+    
+        for t in c_types:
+            api.add(t)
+        api.prepare()
 
 def load_stylesheet(file_name):  # Function to load a stylesheet from a file.
 
