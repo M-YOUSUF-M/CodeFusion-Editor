@@ -24,7 +24,6 @@ Run the following commands to install the required dependencies:
 
 ```bash
 pip install PyQt5 qscintilla google-generativeai
------------------------------------
 ```
 ```bash
 cd 'CodeFusion-Editor\CodeFusion Editor'
