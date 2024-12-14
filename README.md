@@ -1,4 +1,4 @@
-# **PyCxx Code Editor**
+# **CodeFusion Editor**
 
 A simple yet powerful text/code editor built using **Python**, **PyQt5**, and **QScintilla**. This editor comes with essential features for coding and integrates **Generative AI** capabilities using the **Gemini API**.
 
