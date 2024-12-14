@@ -1,0 +1,43 @@
+QVBoxLayout#left_container{
+    background-color: #132a38;
+    margin: 0;
+    padding: 0;
+}
+
+QPushButton#btn{
+    background-color: rgb(18, 51, 94);
+    color:white;
+    padding: 5px;
+    font-size: 15px;
+    border-radius: 10px;
+    margin: 0px;
+}
+
+QTreeWidget#tree_view{
+    /* background-color: #132a38; */
+    background-color: rgb(13, 43, 83);
+    color: white;
+    font-size: 15px;
+    margin: 0;
+    padding: 0;
+    border: 3px solid rgb(18, 51, 94);
+    border-radius: 10px;
+}
+
+QLineEdit#prompt{
+    border-radius: 5px;
+    border: 1px solid #132a38;
+    padding: 5px;
+}
+QPushButton#send{
+    color: black;
+    background-color: rgb(207, 206, 206);
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 15px;
+    border: 1px solid antiquewhite;
+    padding: 5 10px;
+    border-radius:5px ;
+}
+QPushButton#send:hover{
+    background-color: aliceblue;
+}
