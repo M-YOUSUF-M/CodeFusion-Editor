@@ -23,10 +23,12 @@ A simple yet powerful text/code editor built using **Python**, **PyQt5**, and **
 Run the following commands to install the required dependencies:
 
 ```bash
-pip install PyQt5
-pip install qscintilla --no-cache-dir
-pip install google-generativeai
+pip install PyQt5 qscintilla google-generativeai
 -----------------------------------
-cd 'PyCxx-Editor\PyCxx Editor'
+```
+```bash
+cd 'CodeFusion-Editor\CodeFusion Editor'
+```
+```bash
 python editor.py
-
+```
