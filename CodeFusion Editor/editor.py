@@ -192,7 +192,7 @@ class UI(QWidget):
 
         self.resize(1080, 720)  # Setting the initial size of the window.
 
-        self.setWindowTitle('PyCxx IDE')  # Setting the title of the window.
+        self.setWindowTitle('CodeFusion Editor')  # Setting the title of the window.
 
         self.__folder = QPushButton('Folder')  # Creating a Folder button.
 
@@ -838,8 +838,6 @@ class Editor(QsciScintilla):
                 file.write(cleaned_text)
 
                 # print(self.text()) #commented out: Unnecessary print statement.
-
-        print("file saved")  # Printing "file saved" to the console.
 
     def openTerminalRunCommand(self, command):
         if platform.system() == 'Windows':
