@@ -129,6 +129,12 @@ class GeminiThreat(QThread):
         # Initializing GeminiAi object with API key and model.
         self.ai = GeminiAi(
             "AIzaSyAjBYJJLqpIkWi7owhN_sdMDkd64GqeXoo", "gemini-1.5-flash")
+    def check_internet_connection(self):
+        try:
+            subprocess.check_output(["ping", "google.com"])
+            return True
+        except subprocess.CalledProcessError:
+            return False
 
     # Defining the run method, which is executed when the thread starts.
     def run(self):
@@ -137,16 +143,20 @@ class GeminiThreat(QThread):
         markdown = ''
 
         # Iterating through the chunks of the AI response.
-        for chunk in self.ai.generateAnswer(self.input_text):
+        if (self.check_internet_connection()):
+            for chunk in self.ai.generateAnswer(self.input_text):
 
-            # self._chat_area.insertPlainText(chunk.text) #commented out:  Replaced by accumulating markdown
+                # self._chat_area.insertPlainText(chunk.text) #commented out:  Replaced by accumulating markdown
 
-            # self._chat_area.repaint() #commented out: Repaint handled by progress signal
+                # self._chat_area.repaint() #commented out: Repaint handled by progress signal
 
-            # Appending the text of each chunk to the markdown string.
-            markdown += chunk.text
+                # Appending the text of each chunk to the markdown string.
+                markdown += chunk.text
 
             # Emitting the updated markdown as a progress signal.
+                self.progress.emit(markdown)
+        elif not self.check_internet_connection():
+            markdown = "No Internet Connection.Please Connect to Internet"
             self.progress.emit(markdown)
 
 
@@ -165,6 +175,8 @@ class GeminiAi:  # Defining a class GeminiAi for interacting with the Google Gem
         self._chat = self._model.start_chat()
 
     # Method to generate an answer from the AI model, takes input string as argument.
+    
+
     def generateAnswer(self, input: str):
 
         # Generating content from the model with streaming enabled.
@@ -479,8 +491,6 @@ class UI(QWidget):
             # Loading the 'explain' prompt from a file.
             input_prompt = self._ai.loadPrompt('prompt_train/explain.txt')
 
-            print('explain')  # Printing 'explain' to the console.
-
         elif self._prompt_command.currentIndex() == 2:  # fixt
 
             # Loading the 'fixt' prompt from a file.
@@ -520,9 +530,9 @@ class UI(QWidget):
     def updateChatArea(self, text: str):
 
         # Setting the markdown text in the chat area.
-        self._chat_area.setMarkdown(text)
+            self._chat_area.setMarkdown(text)
 
-        self._chat_area.repaint()  # Repainting the chat area.
+            self._chat_area.repaint()  # Repainting the chat area.
 
     def execute_cmd(self, cmd):
         if platform.system() == "Windows":
@@ -853,6 +863,7 @@ class Editor(QsciScintilla):
 
         # Returning True if the executable is found, False otherwise.
         return shutil.which(executable_name) is not None
+
     def setupAutocompletePython(self):
         # Initialize API object for Python Lexer
         api = QsciAPIs(self.lexer)
