@@ -70,6 +70,7 @@ from PyQt5.Qsci import (
 
 import google.generativeai as gemini  # Importing the Google Gemini AI library.
 
+from dotenv import load_dotenv,dotenv_values #loading to use .env
 
 import os  # Importing the os module for operating system functionalities.
 import platform  # Importing the platform module for system functionalities.
@@ -154,6 +155,7 @@ class GeminiThreat(QThread):
                 markdown += chunk.text
 
             # Emitting the updated markdown as a progress signal.
+
                 self.progress.emit(markdown)
         elif not self.check_internet_connection():
             markdown = "No Internet Connection.Please Connect to Internet"
@@ -256,8 +258,11 @@ class UI(QWidget):
         self.ide.setObjectName("ide-background")
 
         # Initializing GeminiAi object.
-        self._ai = GeminiAi(
-            "AIzaSyAjBYJJLqpIkWi7owhN_sdMDkd64GqeXoo", "gemini-1.5-flash")
+        load_dotenv() #loading the .envs
+        API_KEY:str = os.getenv("API_KEY")
+        AI_MODEL:str = os.getenv("AI_MODEL")
+
+        self._ai = GeminiAi(API_KEY, AI_MODEL)
 
         # Creating a combo box for selecting AI commands.
         self._prompt_command = QComboBox()
