@@ -1,0 +1,5 @@
+PyQt5
+qscintilla
+google-generativeai
+jedi
+python-dotenv

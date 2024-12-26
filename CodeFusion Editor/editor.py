@@ -107,6 +107,21 @@ term_map = {
     "xterm": "xterm --hold -e {}",
 }
 
+load_dotenv() #loading the .envs
+API_KEY:str = os.getenv("API_KEY")
+AI_MODEL:str = os.getenv("AI_MODEL")
+
+def resource_path(relative_path):
+    # Get absolute path to resource, works for dev and for PyInstaller
+    if getattr(sys, 'frozen', False):
+        # PyInstaller creates a temp folder and stores path in _MEIPASS
+        base_path = sys._MEIPASS
+    else:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
+
+
 
 # Defining a class GeminiThreat that inherits from QThread for handling AI operations in a separate thread.
 class GeminiThreat(QThread):
@@ -115,7 +130,7 @@ class GeminiThreat(QThread):
     progress = pyqtSignal(str)
 
     # Constructor for GeminiThreat, takes chat area and input string as arguments.
-    def __init__(self, chat_area: QTextEdit, input: str):
+    def __init__(self, chat_area: QTextEdit, text: str):
 
         # Calling the superclass constructor to initialize the QThread.
         super(QThread, self).__init__()
@@ -123,13 +138,12 @@ class GeminiThreat(QThread):
         # Assigning the chat area widget to the instance.
         self.chat_area = chat_area
 
-        self.input_text = input  # Assigning the input text to the instance.
+        self.input_text = text  # Assigning the input text to the instance.
 
         # self.finished = pyqtSignal() #commented out: Unnecessary signal, QThread already has finished signal.
 
         # Initializing GeminiAi object with API key and model.
-        self.ai = GeminiAi(
-            "AIzaSyAjBYJJLqpIkWi7owhN_sdMDkd64GqeXoo", "gemini-1.5-flash")
+        self.ai = GeminiAi(API_KEY, AI_MODEL)
     def check_internet_connection(self):
         try:
             subprocess.check_output(["ping", "google.com"])
@@ -189,7 +203,7 @@ class GeminiAi:  # Defining a class GeminiAi for interacting with the Google Gem
     # Method to load a prompt from a file, takes file name as argument.
     def loadPrompt(self, file_name: str):
 
-        with open(file_name) as file:  # Opening the file in read mode.
+        with open(resource_path(file_name)) as file:  # Opening the file in read mode.
 
             prompt_enhance = file.read()  # Reading the content of the file.
 
@@ -258,9 +272,6 @@ class UI(QWidget):
         self.ide.setObjectName("ide-background")
 
         # Initializing GeminiAi object.
-        load_dotenv() #loading the .envs
-        API_KEY:str = os.getenv("API_KEY")
-        AI_MODEL:str = os.getenv("AI_MODEL")
 
         self._ai = GeminiAi(API_KEY, AI_MODEL)
 
@@ -1041,7 +1052,7 @@ class Editor(QsciScintilla):
 
 def load_stylesheet(file_name):  # Function to load a stylesheet from a file.
 
-    with open(file_name, 'r') as file:  # Opening the file in read mode.
+    with open(resource_path(file_name), 'r') as file:  # Opening the file in read mode.
 
         return file.read()  # Returning the content of the file.
 
