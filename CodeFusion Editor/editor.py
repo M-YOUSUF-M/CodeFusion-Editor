@@ -13,6 +13,8 @@ from PyQt5.QtCore import (
     # Importing necessary modules from PyQt5.QtCore for Qt functionalities, signals and threads.
 )
 
+from PyQt5.QtGui import QIcon
+
 
 from PyQt5.QtWidgets import (
 
@@ -40,7 +42,7 @@ from PyQt5.QtWidgets import (
 
     QDockWidget,
 
-    QComboBox
+    QComboBox,
 
 )  # Importing various PyQt5.QtWidgets modules for creating GUI elements like windows, layouts, buttons, text editors, etc.
 
@@ -73,10 +75,14 @@ import google.generativeai as gemini  # Importing the Google Gemini AI library.
 from dotenv import load_dotenv,dotenv_values #loading to use .env
 
 import os  # Importing the os module for operating system functionalities.
+
 import platform  # Importing the platform module for system functionalities.
 
 # Importing the subprocess module for running external commands.
 import subprocess
+
+#to check internet connection
+import requests
 
 import shutil  # Importing the shutil module for high-level file operations.
 
@@ -146,10 +152,10 @@ class GeminiThreat(QThread):
         self.ai = GeminiAi(API_KEY, AI_MODEL)
     def check_internet_connection(self):
         try:
-            subprocess.check_output(["ping", "google.com"])
+            response = requests.get("https://google.com", timeout=5)
             return True
-        except subprocess.CalledProcessError:
-            return False
+        except requests.ConnectionError:
+            return False 
 
     # Defining the run method, which is executed when the thread starts.
     def run(self):
@@ -173,6 +179,9 @@ class GeminiThreat(QThread):
                 self.progress.emit(markdown)
         elif not self.check_internet_connection():
             markdown = "No Internet Connection.Please Connect to Internet"
+            self.progress.emit(markdown)
+        else:
+            markdown = "Some Issue with Network , please check again"
             self.progress.emit(markdown)
 
 
@@ -268,8 +277,7 @@ class UI(QWidget):
         # Adding the Run button to the layout.
         self.menu_bar_layout.addWidget(self.__runProg)
 
-        self.ide = Editor()  # Creating an instance of the Editor class.
-        self.ide.setObjectName("ide-background")
+        self.ide =Editor()  # Creating an instance of the Editor class.
 
         # Initializing GeminiAi object.
 
@@ -505,16 +513,16 @@ class UI(QWidget):
         elif self._prompt_command.currentIndex() == 1:  # explain
 
             # Loading the 'explain' prompt from a file.
-            input_prompt = self._ai.loadPrompt('prompt_train/explain.txt')
+            input_prompt = self._ai.loadPrompt('.prompt_train/explain.txt')
 
         elif self._prompt_command.currentIndex() == 2:  # fixt
 
             # Loading the 'fixt' prompt from a file.
-            input_prompt = self._ai.loadPrompt('prompt_train/fixt.txt')
+            input_prompt = self._ai.loadPrompt('.prompt_train/fixt.txt')
 
         elif self._prompt_command.currentIndex() == 3:  # comment
 
-            input_prompt = self._ai.loadPrompt('prompt_train/comment.txt')
+            input_prompt = self._ai.loadPrompt('.prompt_train/comment.txt')
 
         # Getting the text from the prompt line edit.
         input_command = self._prompt.text()
@@ -693,7 +701,8 @@ class Editor(QsciScintilla):
 
         # Calling the superclass constructor to initialize the QsciScintilla.
         super().__init__()
-
+        self.setPaper(QColor("#FFFFFF"))
+        self.setColor(QColor("#9eaaaae"))
         # Setting the margin type to number margin.
         self.setMarginType(0, QsciScintilla.NumberMargin)
 
@@ -701,7 +710,7 @@ class Editor(QsciScintilla):
         self.setMarginWidth(0, '00000')
 
         # Setting the color of the margin.
-        self.setMarginsForegroundColor(QColor("#9da8af"))
+        self.setMarginsForegroundColor(QColor("#5C6370"))
 
         # Setting the wrap mode to wrap by word.
         self.setWrapMode(QsciScintilla.WrapWord)
@@ -715,10 +724,13 @@ class Editor(QsciScintilla):
         # Setting the folding style.
         self.setFolding(QsciScintilla.PlainFoldStyle)
 
+        #segging cursor color
+        self.setCaretForegroundColor(QColor("#FFCC00"))
+
         self.setCaretLineVisible(True)  # Making the caret line visible.
 
         # Setting the background color of the caret line.
-        self.setCaretLineBackgroundColor(QColor('#e6ffe6'))
+        self.setCaretLineBackgroundColor(QColor("#1e3f7ae3"))
 
         self.setAutoIndent(True)  # Enabling auto-indent.
 
@@ -938,7 +950,7 @@ class Editor(QsciScintilla):
             print(f"Error while adding third-party modules: {e}")
     def cppAutoCompletion(self):
         api = QsciAPIs(self.lexer)
-        """Add C++ keywords and common functions to the auto-completion API."""
+        """Add C++ keywords and common functions to the auto-completion API for faster suggestion."""
         cpp_headers = [
             "#include", "#define", "#if", "#elif", "#else", "#endif", "#ifdef", "#ifndef", "#pragma", "#error", "#warning", 
             "iostream", "fstream", "sstream", "string", "vector", "map", "set", "list", "deque", 
@@ -1067,6 +1079,8 @@ def main():  # Main function.
     app.setStyleSheet(stylesheet)
 
     editor = UI()  # Creating an instance of the UI class.
+
+    editor.setWindowIcon(QIcon(".icon\icon.png"))
 
     editor.show()  # Showing the main window.
 
