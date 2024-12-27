@@ -1080,7 +1080,7 @@ def main():  # Main function.
 
     editor = UI()  # Creating an instance of the UI class.
 
-    editor.setWindowIcon(QIcon(".icon\icon.png"))
+    editor.setWindowIcon(QIcon("icon.ico")) #setting the window icon
 
     editor.show()  # Showing the main window.
 
