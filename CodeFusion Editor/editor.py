@@ -86,6 +86,8 @@ import requests
 
 import shutil  # Importing the shutil module for high-level file operations.
 
+import webbrowser #importing webbrowser to redirect to api key page
+
 # Importing the sys module for system-specific parameters and functions.
 import sys
 import builtins
@@ -113,9 +115,9 @@ term_map = {
     "xterm": "xterm --hold -e {}",
 }
 
-load_dotenv() #loading the .envs
-API_KEY:str = os.getenv("API_KEY")
-AI_MODEL:str = os.getenv("AI_MODEL")
+
+
+
 
 def resource_path(relative_path):
     # Get absolute path to resource, works for dev and for PyInstaller
@@ -374,7 +376,7 @@ class UI(QWidget):
         self.__folder.clicked.connect(self.showFiles)
 
         # Connecting the clicked signal of the New button to the newFile method.
-        self.__newfile.clicked.connect(self.ide.newFile)
+        self.__newfile.clicked.connect(self.createAndShowFilesFolder)
 
         # Connecting the clicked signal of the Open button to the openAndShowFilesFolder method.
         self.__openfile.clicked.connect(self.openAndShowFilesFolder)
@@ -426,6 +428,13 @@ class UI(QWidget):
         self.populateTree(os.path.dirname(self.ide.file_path))
 
     # Recursive method to add items to the file tree.
+    def createAndShowFilesFolder(self):
+        #creating a file using the newFile method of the Editor class
+        self.ide.newFile()
+
+        #Populating the file tree with the files in the directory of the opened file.
+        self.populateTree(os.path.dirname(self.ide.file_path))
+
     def add_tree_items(self, parent_item, path):
 
         extension = ['.py', '.c', '.cpp', '.txt',  # List of supported file extensions.
@@ -744,6 +753,7 @@ class Editor(QsciScintilla):
 
         # Initializing the directory path to an empty string.
         self.dir_path = ''
+    
 
     def loadFile(self, filepath):  # Method to load a file into the editor.
 
@@ -842,12 +852,20 @@ class Editor(QsciScintilla):
 
         if fileName:  # Checking if a file name was selected.
 
+            self.file_path = fileName  # Setting the file path.
+
+            # Setting the directory path.
+            self.dir_path = os.path.dirname(fileName)
+
+            self.loadFile(fileName)  # Loading the file into the editor.
+
             # Checking if the file already exists.
             if not os.path.exists(fileName):
 
                 with open(fileName, 'w') as file:  # Creating the file.
 
                     file.write('')  # Writing an empty string to the file.
+            
 
     def saveFile(self):  # Method to save a file.
 
@@ -1062,31 +1080,102 @@ class Editor(QsciScintilla):
             api.add(t)
         api.prepare()
 
+class VerifyAPI(QWidget):
+    def __init__(self):
+        super().__init__()
+
+        self.setFixedSize(360, 144)
+
+        self.msg = QLabel()
+        self.msg.hide()
+
+        self.prompt = QLineEdit()
+        self.prompt.setObjectName("prompt")
+
+        self.get_key = QPushButton("Get API Key")
+        self.get_key.clicked.connect(lambda: webbrowser.open("https://aistudio.google.com/app/apikey"))
+
+        self.have_key = QPushButton("Submit the Key")
+        self.have_key.clicked.connect(self.getValues)
+
+        self.prompt_layout = QVBoxLayout()
+        self.prompt_layout.addWidget(self.prompt)
+        self.prompt_layout.addWidget(self.msg)
+        self.prompt_layout.addWidget(self.get_key)
+        self.prompt_layout.addWidget(self.have_key)
+        self.setLayout(self.prompt_layout)
+
+        self.show()
+
+    def Writedotenv(self, key: str, value: str):
+        with open(".env", "a") as file:
+            file.write(f'{key}="{value}"\n')
+
+    def getValues(self):
+        value = self.prompt.text()
+        if value and self.verify_api_key(value):
+            self.Writedotenv("API_KEY", value)
+            self.Writedotenv("AI_MODEL", "gemini-1.5-flash")
+            load_dotenv()  # Reload the .env file to load new values
+            self.close()  # Close the prompt window
+            Readdotevn()
+            self.launch_main_ui()
+
+    def verify_api_key(self, api_key):
+        API_VERSION = 'v1beta'
+        api_url = f'https://generativelanguage.googleapis.com/{API_VERSION}/models?key={api_key}'
+
+        try:
+            response = requests.get(api_url, headers={'Content-Type': 'application/json'})
+            response.raise_for_status()  # Raise an exception for non-200 status codes
+            return True
+
+        except requests.exceptions.RequestException as e:
+            self.msg.setText("Invalid Key")
+            self.msg.show()
+            return False
+
+        except Exception as e:
+            self.msg.setText("An unexpected error occurred")
+            self.msg.show()
+            return False
+
+    def launch_main_ui(self):
+        global editor
+        editor = UI()  # Launch the main UI
+        editor.setWindowIcon(QIcon("icon.ico"))
+        editor.show()
+
+
+def Readdotevn():
+    global API_KEY, AI_MODEL
+    load_dotenv()
+    API_KEY = os.getenv("API_KEY")
+    AI_MODEL = os.getenv("AI_MODEL")
+
 def load_stylesheet(file_name):  # Function to load a stylesheet from a file.
 
     with open(resource_path(file_name), 'r') as file:  # Opening the file in read mode.
 
         return file.read()  # Returning the content of the file.
 
+def main():
+    global app
+    app = QApplication([])
 
-def main():  # Main function.
-
-    app = QApplication([])  # Creating a QApplication instance.
-
-    stylesheet = load_stylesheet("styles/style.qss")  # Loading the stylesheet.
-
-    # Setting the stylesheet for the application.
+    stylesheet = load_stylesheet("styles/style.qss")
     app.setStyleSheet(stylesheet)
 
-    editor = UI()  # Creating an instance of the UI class.
+    if os.path.exists('.env'):
+        Readdotevn()
+        global editor
+        editor = UI()
+        editor.setWindowIcon(QIcon("icon.ico"))
+        editor.show()
+    else:
+        prompt = VerifyAPI()
 
-    editor.setWindowIcon(QIcon("icon.ico")) #setting the window icon
+    app.exec_()
 
-    editor.show()  # Showing the main window.
-
-    app.exec_()  # Starting the application event loop.
-
-
-if __name__ == '__main__':  # Checking if the script is being run directly.
-
-    main()  # Calling the main function.
+if __name__ == '__main__':
+    main()
