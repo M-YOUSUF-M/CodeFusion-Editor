@@ -1130,10 +1130,16 @@ class VerifyAPI(QWidget):
             response.raise_for_status()  # Raise an exception for non-200 status codes
             return True
 
+        except requests.ConnectionError as e:
+            self.msg.setText("Network error")
+            self.msg.show()
+            return False
+
         except requests.exceptions.RequestException as e:
             self.msg.setText("Invalid Key")
             self.msg.show()
             return False
+
 
         except Exception as e:
             self.msg.setText("An unexpected error occurred")
