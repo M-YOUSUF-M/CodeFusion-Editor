@@ -1118,7 +1118,7 @@ class VerifyAPI(QWidget):
             self.Writedotenv("AI_MODEL", "gemini-1.5-flash")
             load_dotenv()  # Reload the .env file to load new values
             self.close()  # Close the prompt window
-            Readdotevn()
+            read_dotenv()
             self.launch_main_ui()
 
     def verify_api_key(self, api_key):
@@ -1149,11 +1149,11 @@ class VerifyAPI(QWidget):
     def launch_main_ui(self):
         global editor
         editor = UI()  # Launch the main UI
-        editor.setWindowIcon(QIcon("icon.ico"))
+        editor.setWindowIcon(QIcon(resource_path("icon.ico")))
         editor.show()
 
 
-def Readdotevn():
+def read_dotenv():
     global API_KEY, AI_MODEL
     load_dotenv()
     API_KEY = os.getenv("API_KEY")
@@ -1173,10 +1173,10 @@ def main():
     app.setStyleSheet(stylesheet)
 
     if os.path.exists('.env'):
-        Readdotevn()
+        read_dotenv()
         global editor
         editor = UI()
-        editor.setWindowIcon(QIcon("icon.ico"))
+        editor.setWindowIcon(QIcon(resource_path("icon.ico")))
         editor.show()
     else:
         prompt = VerifyAPI()
