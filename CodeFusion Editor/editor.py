@@ -578,12 +578,29 @@ class UI(QWidget):
                     break
 
     def install(self, package):
-        if not shutil.which(package):
-            print(f"Package {package} is not installed")
-        for pkg in pkg_map:
-            if shutil.which(pkg) is not None:
-                cmd = pkg_map[pkg].format(package)
-                self.execute_cmd(cmd)
+        if platform.system() == "Windows":
+            if package == "python":
+                # Download and run Python installer
+                # subprocess.run(["curl", "-o", "python-installer.exe",
+                                # "https://www.python.org/ftp/python/3.12.1/python-3.12.1-amd64.exe"])
+                # subprocess.run(["python-installer.exe"])
+                webbrowser.open("https://www.python.org/downloads/")
+            elif package in {"gcc", "g++"}:
+                # Download and run MinGW installer
+                # subprocess.run(["curl", "-o", "mingw-w64-installer.exe",
+                                # "https://sourceforge.net/projects/mingw-w64/files/latest/download"])
+                # subprocess.run(["mingw-w64-installer.exe"])
+                webbrowser.open("https://sourceforge.net/projects/mingw-w64/files/latest/download")
+            else:
+                print(f"Unsupported package: {package},please surch on internet 'how to install {package}'")
+
+        else:
+            if not shutil.which(package):
+                print(f"Package {package} is not installed")
+            for pkg in pkg_map:
+                if shutil.which(pkg) is not None:
+                    cmd = pkg_map[pkg].format(package)
+                    self.execute_cmd(cmd)
 
     def show_prompt(self, package):
         self.ok_btn.clicked.connect(lambda: self.install(
@@ -635,7 +652,6 @@ class UI(QWidget):
 
                 # subprocess.run(["python", file_path]) # Running the Python script.
                 command = f'python "{os.path.join(self.ide.dir_path, self.ide.file_path)}"'
-                print(command)
                 self.execute_cmd(command)
 
             else:
@@ -656,7 +672,6 @@ class UI(QWidget):
             if self.ide.is_executable_available(compiler):
 
                 print(
-
                     # Printing a message to the console.
                     f"{compiler} compiler found. Compiling and running the program...")
 
@@ -666,12 +681,14 @@ class UI(QWidget):
                 output_file = (f"{base_name.split('/')[-1]}.exe" if platform.system() == "Windows" else f"{base_name.split('/')[-1]}.out")
                 os.chdir(self.ide.dir_path)
                 # Creating the compile command.
-                compile_command = [compiler, file_path, "-o", output_file]
+                print(os.getcwd())
+                print(file_path)
+                compile_command = [compiler,file_path, "-o", output_file]
 
                 # execute_command_in_terminal(compile_command) #commented out: Unnecessary function call.
 
                 # Running the compile command.
-                compile_process = subprocess.run(compile_command)
+                compile_process = subprocess.Popen(compile_command)
 
             # Check if compilation was successful
 
