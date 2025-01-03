@@ -568,11 +568,14 @@ class UI(QWidget):
             self._chat_area.repaint()  # Repainting the chat area.
 
     def execute_cmd(self, cmd):
-        for term in term_map:
-            if shutil.which(term) is not None:
-                final = term_map[term].format(cmd)
-                subprocess.Popen(final, shell=True)
-                break
+        if platform.system() == "Windows":
+            subprocess.Popen(["powershell", "-NoExit", "-Command", cmd])
+        else:
+            for term in term_map:
+                if shutil.which(term) is not None:
+                    final = term_map[term].format(cmd)
+                    subprocess.Popen(final, shell=True)
+                    break
 
     def install(self, package):
         if platform.system() == "Windows":
@@ -685,7 +688,7 @@ class UI(QWidget):
                 # execute_command_in_terminal(compile_command) #commented out: Unnecessary function call.
 
                 # Running the compile command.
-                compile_process = subprocess.Popen(compile_command)
+                compile_process = subprocess.run(compile_command)
 
             # Check if compilation was successful
 
