@@ -568,14 +568,11 @@ class UI(QWidget):
             self._chat_area.repaint()  # Repainting the chat area.
 
     def execute_cmd(self, cmd):
-        if platform.system() == "Windows":
-            subprocess.Popen(["powershell", "-NoExit", "-Command", cmd])
-        else:
-            for term in term_map:
-                if shutil.which(term) is not None:
-                    final = term_map[term].format(cmd)
-                    subprocess.Popen(final, shell=True)
-                    break
+        for term in term_map:
+            if shutil.which(term) is not None:
+                final = term_map[term].format(cmd)
+                subprocess.Popen(final, shell=True)
+                break
 
     def install(self, package):
         if platform.system() == "Windows":
@@ -911,14 +908,6 @@ class Editor(QsciScintilla):
                 file.write(cleaned_text)
 
                 # print(self.text()) #commented out: Unnecessary print statement.
-
-    def openTerminalRunCommand(self, command):
-        if platform.system() == 'Windows':
-            # Ensure the command is passed as a list with explicit path
-            subprocess.Popen(
-                ["powershell", "-NoExit", "-Command", f"& {command}"])
-        else:
-            subprocess.Popen(["bash", "-c", f"{command}"])
 
     # Method to check if an executable is available on the system.
     def is_executable_available(self, executable_name):
