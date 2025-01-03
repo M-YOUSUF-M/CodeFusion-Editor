@@ -822,6 +822,7 @@ class Editor(QsciScintilla):
 
             # Setting the lexer for syntax highlighting.
             self.setLexer(self.lexer)
+            self.lexer.setPaper(QColor("#FFFFFF"))
             
 
     def openFile(self):  # Method to open a file using a file dialog.
