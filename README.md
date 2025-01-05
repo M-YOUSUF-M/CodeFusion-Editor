@@ -12,6 +12,9 @@ A simple yet powerful text/code editor built using **Python**, **PyQt5**, and **
 - **AI-Powered Suggestions**: Enhance your coding experience with AI-assisted suggestions and code generation using the Gemini API.
 ---
 
+## Download & Documentation
+#### The documentation is available [here](https://kasroudra2.github.io/codefusion/)
+
 ## **Installation**
 
 ### **Dependencies**
