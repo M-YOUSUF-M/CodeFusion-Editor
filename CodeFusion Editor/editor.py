@@ -701,7 +701,7 @@ class UI(QWidget):
                         output_command = output_file.replace("\\","/").split('.')[0]
                         
                 #    subprocess.run([output_file]) # Running the compiled program.
-                    self.execute_cmd(f"./{output_command}")
+                    self.execute_cmd(f"./{output_file}")
 
                 else:
 
