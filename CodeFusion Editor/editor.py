@@ -785,48 +785,49 @@ class Editor(QsciScintilla):
 
                 # Setting the text of the editor to the file content.
                 self.setText(file_text)
+            
+
+                extension = filepath.split(".")[-1]  # Getting the file extension.
+
+                match extension:  # Matching the extension to set the appropriate lexer.
+
+                    case "py":
+
+                        self.lexer = QsciLexerPython()
+                        self.setupAutocompletePython()
+
+                    case "c":
+
+                        self.lexer = QsciLexerCPP()
+                        self.cAutoCompletion()
+
+                    case "cpp":
+
+                        self.lexer = QsciLexerCPP()
+                        self.cppAutoCompletion()
+
+                    case "html":
+
+                        self.lexer = QsciLexerHTML()
+
+                    case "css":
+
+                        self.lexer = QsciLexerCSS()
+
+                    case "js":
+
+                        self.lexer = QsciLexerJavaScript()
+
+                    case _:
+
+                        self.lexer = None
+
+                # Setting the lexer for syntax highlighting.
+                self.setLexer(self.lexer)
+                self.lexer.setPaper(QColor("#FFFFFF"))
+                self.lexer.setColor(QColor("#9eaaaae"))
             except Exception as e:
                 print(e)
-
-            extension = filepath.split(".")[-1]  # Getting the file extension.
-
-            match extension:  # Matching the extension to set the appropriate lexer.
-
-                case "py":
-
-                    self.lexer = QsciLexerPython()
-                    self.setupAutocompletePython()
-
-                case "c":
-
-                    self.lexer = QsciLexerCPP()
-                    self.cAutoCompletion()
-
-                case "cpp":
-
-                    self.lexer = QsciLexerCPP()
-                    self.cppAutoCompletion()
-
-                case "html":
-
-                    self.lexer = QsciLexerHTML()
-
-                case "css":
-
-                    self.lexer = QsciLexerCSS()
-
-                case "js":
-
-                    self.lexer = QsciLexerJavaScript()
-
-                case _:
-
-                    self.lexer = None
-
-            # Setting the lexer for syntax highlighting.
-            self.setLexer(self.lexer)
-            self.lexer.setPaper(QColor("#FFFFFF"))
-            self.lexer.setColor(QColor("#9eaaaae"))
             
 
     def openFile(self):  # Method to open a file using a file dialog.
