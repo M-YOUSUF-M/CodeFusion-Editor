@@ -14,6 +14,8 @@ ADD . /app
 RUN pyinstaller \
     --onefile \
     --name codefusion-linux \
+    --noconsole \
+    --icon icon.ico \
     --add-data ".env:." \
     --add-data "icon.ico:." \
     --add-data "styles/*:styles/" \
@@ -37,6 +39,8 @@ RUN pip install -r requirements.txt
 RUN pyinstaller \
     --onefile \
     --name codefusion-windows \
+    --noconsole \
+    --icon icon.ico \
     --add-data ".env:." \
     --add-data "icon.ico:." \
     --add-data "styles/*:styles/" \
