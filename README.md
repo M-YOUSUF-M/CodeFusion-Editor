@@ -21,7 +21,7 @@ A simple yet powerful text/code editor built using **Python**, **PyQt5**, and **
 
 ### **Setup**
 Run the following commands to install the required dependencies:
-## ` better to create a virtual environemnt `
+### ` better to create a virtual environemnt `
 ```bash
 pip install PyQt5 qscintilla google-generativeai jedi python-dotenv
 ```
