@@ -777,13 +777,16 @@ class Editor(QsciScintilla):
         if os.path.isfile(filepath):  # Checking if the file exists.
 
             # Opening the file in read mode.
-            main_file_context = open(filepath, 'r')
+            try:
+                main_file_context = open(filepath, 'r')
 
-            # Reading the content of the file.
-            file_text = main_file_context.read()
+                # Reading the content of the file.
+                file_text = main_file_context.read()
 
-            # Setting the text of the editor to the file content.
-            self.setText(file_text)
+                # Setting the text of the editor to the file content.
+                self.setText(file_text)
+            except Exception as e:
+                print(e)
 
             extension = filepath.split(".")[-1]  # Getting the file extension.
 
